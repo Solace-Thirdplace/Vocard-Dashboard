@@ -823,27 +823,8 @@ const methods = {
                 </div>
             </div>`;
 
-        // Invite Bot Section
-        html += `
-            <div class="section">
-                <div class="header">
-                    <div class="sub-title">
-                        <p>${localeTexts.settings.variable.description3}</p>
-                        <h2>${localeTexts.settings.variable.header3}</h2>
-                    </div>
-                </div>
-                <div class="server-cards">
-                    ${Object.entries(data.inviteGuilds)
-                .map(
-                    ([serverId, serverData]) => `
-                        <a href="${`https://discord.com/oauth2/authorize?client_id=${player.selectedBot.id}&permissions=2184538176&scope=bot%20applications.commands`}" target="_blank" rel="noopener noreferrer">
-                            ${createServerCard(serverId, serverData, true)}
-                        </a>
-                    `
-                )
-                .join("")}
-                </div>
-            </div>`;
+        // Invite Bot Section removed (Solace-Thirdplace fork): single-server deployment,
+        // no need to advertise invites to the user's other servers.
 
         html += getFooterHtml();
         $settingsPage.html(html);
