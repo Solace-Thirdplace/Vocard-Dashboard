@@ -79,7 +79,24 @@ class User:
 
             except:
                 return await self.send({"op": "errorMsg", "level": "error", "msg": "Failed to retrieve guild information. Please try again later!"})
-        
+
+        elif method in ("getSettings", "updateSettings"):
+            # Muse fork: the bot no longer holds the Members intent, so it can't
+            # check the user's guild permissions itself. Verify Manage Guild here
+            # server-side via OAuth (using the user's own token, so it can't be
+            # forged) and forward the permission bitmask to the bot.
+            try:
+                resp: list[dict] = await requests_api(f'{DISCORD_API_BASE_URL}/users/@me/guilds', headers={'Authorization': f'Bearer {self.access_token}'})
+                guild_id = str(payload.get("guildId"))
+                permissions = next((guild['permissions'] for guild in resp if str(guild['id']) == guild_id), 0)
+            except:
+                return await self.send({"op": "errorMsg", "level": "error", "msg": "Failed to verify your permissions. Please try again later!"})
+
+            if permissions < 1275593889:
+                return await self.send({"op": "errorMsg", "level": "error", "msg": "You don't have permission to access these settings."})
+
+            payload["permissions"] = permissions
+
         payload["userId"] = self.id
 
         if self.guild:
